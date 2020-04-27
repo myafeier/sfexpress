@@ -11,6 +11,9 @@ type Service struct {
 	session *xorm.Session
 }
 
+func NewService(session *xorm.Session) *Service {
+	return &Service{session: session}
+}
 func InitDaemon(session *xorm.Session, clientCode, clientCheckCode string) *Service {
 	ClientCheckCode = clientCheckCode
 	ClientCode = clientCode
@@ -80,4 +83,10 @@ func (s *Service) PostOrder(order *OrderRequestBody) (result *OrderResponseBody,
 		return
 	}
 	return
+}
+
+func (s *Service) GetOne(outOrderSn string) (*SfExpressLog, error) {
+	result := new(SfExpressLog)
+	_, err := s.session.Where("", outOrderSn).Get(result)
+	return result, err
 }

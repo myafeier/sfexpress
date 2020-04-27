@@ -148,9 +148,8 @@ type SfExpressLog struct {
 	SfOrderSn    string             `json:"sf_order_sn" xorm:"varchar(100) default '' index"`    //顺丰订单号
 	Request      *OrderRequestBody  `json:"request" xorm:"json"`                                 //请求
 	Response     *OrderResponseBody `json:"response" xorm:"json"`                                //响应
-	RouteInfo    []*RouteInfo
-	Created      time.Time `json:"created" xorm:"created"`
-	Updated      time.Time `json:"updated" xorm:"updated"`
+	Created      time.Time          `json:"created" xorm:"created"`
+	Updated      time.Time          `json:"updated" xorm:"updated"`
 }
 
 func (self *SfExpressLog) TableName() string {
