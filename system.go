@@ -1,6 +1,8 @@
 package sf_express
 
 import (
+	"fmt"
+
 	"github.com/myafeier/log"
 	"xorm.io/xorm"
 )
@@ -86,7 +88,19 @@ func (s *Service) PostOrder(order *OrderRequestBody) (result *OrderResponseBody,
 }
 
 func (s *Service) GetOne(outOrderSn string) (*SfExpressLog, error) {
+	if outOrderSn == "" {
+		err := fmt.Errorf("query param: outOrderSn is null")
+		return nil, err
+	}
 	result := new(SfExpressLog)
-	_, err := s.session.Where("", outOrderSn).Get(result)
+	_, err := s.session.Where("inner_order_sn=?", outOrderSn).Get(result)
 	return result, err
+}
+
+func (s *Service) GetRouteInfo(outOrderSn string) ([]RouteResponseBody, error) {
+	req := new(RouteRequestBody)
+	req.TrackingType = 2
+	req.TrackingNumber = outOrderSn
+	req.MethodType = 1
+	return QueryRouteInfo(req)
 }

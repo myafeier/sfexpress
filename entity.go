@@ -11,7 +11,29 @@ const (
 	InterfaceOfOrderState = "OrderSearchService"                                       //订单结果查询接口
 	InterfaceOfRouteInfo  = "RouteService"                                             //路由查询接口
 )
+const (
+	OrderFilterResultOfNeedVerify OrderFilterResult = 1
+	OrderFilterResultOfOk         OrderFilterResult = 2
+	OrderFilterResultOfDeny       OrderFilterResult = 3
+)
 
+type OrderFilterResult int8
+
+var OrderFilterResults = map[OrderFilterResult]string{
+	OrderFilterResultOfNeedVerify: "待人工确认",
+	OrderFilterResultOfOk:         "可收派",
+	OrderFilterResultOfDeny:       "不可收派",
+}
+
+func (o OrderFilterResult) ToString() string {
+	if r, ok := OrderFilterResults[o]; ok {
+		return r
+	} else {
+		return "-"
+	}
+}
+
+//筛单结果:1:人工确认2:可收派3:不可以收派
 var ClientCode = ""      //客户编码
 var ClientCheckCode = "" //客户校验码
 
@@ -90,8 +112,8 @@ type OrderResponseBody struct {
 	OriginCode string   `xml:"origincode,attr"` //原寄地区域代码
 	DestCode   string   `xml:"destcode,attr"`   //目的地区域代码
 
-	FilterResult int8   `xml:"filter_result,attr"` //筛单结果:1:人工确认2:可收派3:不可以收派
-	Remark       string `xml:"remark,attr"`        //	filter_result=3时必填,不可以收派的原因代码:1:收方超范围2:派方超范围3:其它原因高峰管控提示信息【数字】:【高峰管控提示信息】(如 4:温馨提示 ,1:春运延时)
+	FilterResult OrderFilterResult `xml:"filter_result,attr"` //筛单结果:1:人工确认2:可收派3:不可以收派
+	Remark       string            `xml:"remark,attr"`        //	filter_result=3时必填,不可以收派的原因代码:1:收方超范围2:派方超范围3:其它原因高峰管控提示信息【数字】:【高峰管控提示信息】(如 4:温馨提示 ,1:春运延时)
 }
 
 // 查询订单的处理结果
@@ -117,10 +139,10 @@ type RouteResponseBody struct {
 }
 type RouteInfo struct {
 	XMLName       xml.Name `xml:"Route"`
-	AcceptTime    string   `xml:"accept_time,attr"`    //路由节点发生的时间,格式:YYYY-MM-DD HH24:MM:SS,示例:2012-7-30 09:30:00
-	AcceptAddress string   `xml:"accept_address,attr"` //路由节点发生的地点
-	Remark        string   `xml:"remark,attr"`         //路由节点具体描述
-	Opcode        string   `xml:"opcode,attr"`         //路由节点操作码
+	AcceptTime    string   `xml:"accept_time,attr" json:"accept_time"`       //路由节点发生的时间,格式:YYYY-MM-DD HH24:MM:SS,示例:2012-7-30 09:30:00
+	AcceptAddress string   `xml:"accept_address,attr" json:"accept_address"` //路由节点发生的地点
+	Remark        string   `xml:"remark,attr" json:"remark"`                 //路由节点具体描述
+	Opcode        string   `xml:"opcode,attr" json:"opcode"`                 //路由节点操作码
 }
 
 //通用查询结构

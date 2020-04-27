@@ -60,9 +60,5 @@ func QueryRouteInfo(req *RouteRequestBody) (result []RouteResponseBody, err erro
 	}
 
 	result = OrginData.Body
-	if len(result) != 1 {
-		err = fmt.Errorf("result length error")
-		return
-	}
 	return
 }
