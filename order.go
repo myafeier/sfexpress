@@ -59,15 +59,7 @@ func PostOrder(order *OrderRequestBody) (result *OrderResponseBody, err error) {
 		err = fmt.Errorf("下单失败，顺丰返回:%s", OrginData.Error.Code)
 		return
 	}
-
 	result = &OrginData.Body
-	if result.FilterResult == 1 {
-		err = fmt.Errorf("该订单需要顺丰人工确认是否可以邮寄")
-		return
-	} else if result.FilterResult == 3 {
-		err = fmt.Errorf("该订单无法邮寄，原因：%s", result.Remark)
-		return
-	}
 	return
 }
 
@@ -116,18 +108,11 @@ func QueryOrderState(req *OrderStateRequestBody) (result *OrderResponseBody, err
 	}
 	log.Debug("%s", data)
 	if OrginData.Head != "OK" {
-		err = fmt.Errorf("下单失败，顺丰返回:%s", OrginData.Error.Code)
+		err = fmt.Errorf("查询失败，顺丰返回:%s", OrginData.Error.Code)
 		return
 	}
 
 	result = &OrginData.Body
-	if result.FilterResult == 1 {
-		err = fmt.Errorf("该订单需要顺丰人工确认是否可以邮寄")
-		return
-	} else if result.FilterResult == 3 {
-		err = fmt.Errorf("该订单无法邮寄，原因：%s", result.Remark)
-		return
-	}
 	return
 }
 func signature(data []byte) string {

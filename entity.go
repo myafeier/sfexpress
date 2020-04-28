@@ -96,6 +96,7 @@ type OrderRequestBody struct {
 	DoCall            int8     `xml:"is_docall,attr"`               //是否要求通过手持终端通知顺丰收派员收件:1:要求其它为不要求
 	UseUnifiedWayBill int8     `xml:"is_unified_waybill_no,attr"`   //是否使用国家统一面单号:默认0 。1:是, 0:否
 	Cargo             Cargo    `xml:"Cargo"`                        //货物信息
+	//	PayMethod         int8     `xml:"pay_method"`                   //1:寄方付
 }
 
 //货物信息

@@ -71,13 +71,19 @@ func (s *Service) PostOrder(order *OrderRequestBody) (result *OrderResponseBody,
 		}
 	}
 	result, err = PostOrder(order)
-	if err != nil {
+	if err != nil || result.FilterResult != 2 {
 		log.Error(err.Error())
+		if result.FilterResult == 1 {
+			err = fmt.Errorf("该订单需要顺丰人工确认是否可以邮寄")
+		} else if result.FilterResult == 3 {
+			err = fmt.Errorf("该订单无法邮寄，原因：%s", result.Remark)
+		}
 		sfLog.Response = new(OrderResponseBody)
 		sfLog.Response.Remark = err.Error()
 		s.session.ID(sfLog.Id).Cols("response").Update(sfLog)
 		return
 	}
+
 	sfLog.Response = result
 	_, err = s.session.ID(sfLog.Id).Cols("response").Update(sfLog)
 	if err != nil {
@@ -103,4 +109,34 @@ func (s *Service) GetRouteInfo(outOrderSn string) ([]RouteResponseBody, error) {
 	req.TrackingNumber = outOrderSn
 	req.MethodType = 1
 	return QueryRouteInfo(req)
+}
+
+func (s *Service) CheckOrderState(outOrderSn string) (*OrderResponseBody, error) {
+	req := new(OrderStateRequestBody)
+	req.OrderId = outOrderSn
+	result, err := QueryOrderState(req)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+
+	elog, err := s.GetOne(outOrderSn)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	if elog.Id == 0 {
+		err = fmt.Errorf("express order: %s  not found", outOrderSn)
+		return nil, err
+	}
+	if elog.Response != nil && elog.Response.FilterResult != result.FilterResult {
+		elog.Response.FilterResult = result.FilterResult
+		elog.Response.Remark = result.Remark
+		_, err = s.session.ID(elog.Id).Cols("response").Update(elog)
+		if err != nil {
+			log.Error(err.Error())
+			return result, err
+		}
+	}
+	return result, nil
 }
