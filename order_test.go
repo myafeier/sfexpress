@@ -18,7 +18,7 @@ func TestOrder(t *testing.T) {
 	order := OrderRequestBody{}
 	order.CustomerId = "7551234567"
 	order.DoCall = 1
-	order.ExpressType = "T4"
+	order.ExpressType = "11"
 	order.FromAddress = "江东华城"
 	order.FromProvince = "云南省"
 	order.FromCity = "昆明市"
